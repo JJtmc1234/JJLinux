@@ -21,3 +21,11 @@ Every departure from LFS 13.1-systemd as written. One line each: what changed, a
 
 ## Chapter 4
 - 4.3: `passwd lfs` skipped - optional per the book; we only `su - lfs` from root.
+
+## Chapters 5-7 (process, not commands)
+- Builds run inside tmux on the build host - an SSH drop must not kill a compile.
+- Every package is wrapped as `{ time { ... } ; } 2>&1 | tee logs/<section>-<pkg>.log` - build logs feed JPM recipes; `time` is the book's own SBU advice.
+- 5.5: Glibc configure/make/install chain is prefixed with a guard (`whoami` = lfs and `LFS` = /mnt/lfs) - enforces the book's Warning about installing Glibc onto the host.
+- 5.6 onward: packages are built by scripts in `recipes/lfs-13.1/` with the book's commands verbatim, stop-on-first-error, and per-package logs; the 5.5 sanity checks are asserted automatically.
+- 7.6: `exec /usr/bin/bash --login` skipped inside the script - it only refreshes the interactive prompt.
+- 7.3: virtual file system mounts are idempotent (`mountpoint -q || mount`) - safe re-entry after a reboot.
