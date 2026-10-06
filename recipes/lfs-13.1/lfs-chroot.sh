@@ -19,7 +19,12 @@ fi
 
 # 7.3 Virtual kernel file systems (skip any already mounted)
 mkdir -pv $LFS/{dev,proc,sys,run}
-mountpoint -q $LFS/dev     || mount -v --bind /dev $LFS/dev
+if ! mountpoint -q $LFS/dev; then
+  mount -v --bind /dev $LFS/dev
+  # JJLinux deviation: Debian's /dev is a *shared* mount, so mounts made under $LFS/dev (pts, shm)
+  # would propagate back onto the host's /dev. Make the bind private to stop that.
+  mount --make-private $LFS/dev
+fi
 mountpoint -q $LFS/dev/pts || mount -vt devpts devpts -o gid=5,mode=0620 $LFS/dev/pts
 mountpoint -q $LFS/proc    || mount -vt proc proc $LFS/proc
 mountpoint -q $LFS/sys     || mount -vt sysfs sysfs $LFS/sys
