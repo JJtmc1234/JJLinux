@@ -212,6 +212,18 @@ p_linux() {
 }
 
 # ---------- 10.4 GRUB (UEFI, removable path) ----------
+# JJLinux rule: emergency boot NEVER asks for a password and is never disabled (root shell, / remounted rw)
+c_emergency() {
+  install -vdm755 /etc/systemd/system/emergency.service.d
+  cat > /etc/systemd/system/emergency.service.d/10-jjlinux-nopasswd.conf << "EOF"
+# JJLinux: emergency mode never asks for a password (like init=/bin/bash, but with systemd)
+[Service]
+ExecStartPre=-/usr/bin/mount -o remount,rw /
+ExecStart=
+ExecStart=-/bin/sh -c '/bin/bash --login; /usr/bin/systemctl --job-mode=fail --no-block default'
+EOF
+}
+
 p_grubsetup() {
   mkdir -pv /boot/efi
   mountpoint -q /boot/efi || mount -v /boot/efi
@@ -221,6 +233,16 @@ p_grubsetup() {
 # Begin /boot/grub/grub.cfg
 set default=0
 set timeout=5
+
+# JJLinux: one-shot boot selection (used by grub-reboot)
+if [ -s \$prefix/grubenv ]; then
+  load_env
+fi
+if [ "\${next_entry}" ] ; then
+   set default="\${next_entry}"
+   set next_entry=
+   save_env next_entry
+fi
 
 insmod part_gpt
 insmod ext2
@@ -235,14 +257,17 @@ menuentry "JJLinux - rescue (rescue.target)" {
         linux   /boot/vmlinuz-7.1.8-lfs-13.1-systemd root=PARTUUID=$ROOT_PARTUUID ro systemd.unit=rescue.target
 }
 menuentry "JJLinux - emergency (emergency.target)" {
-        linux   /boot/vmlinuz-7.1.8-lfs-13.1-systemd root=PARTUUID=$ROOT_PARTUUID ro systemd.unit=emergency.target
+        linux   /boot/vmlinuz-7.1.8-lfs-13.1-systemd root=PARTUUID=$ROOT_PARTUUID rw systemd.unit=emergency.target
+}
+menuentry "JJLinux - shell (init=/bin/bash, last resort)" {
+        linux   /boot/vmlinuz-7.1.8-lfs-13.1-systemd root=PARTUUID=$ROOT_PARTUUID rw init=/bin/bash
 }
 # End /boot/grub/grub.cfg
 EOF
   ls -l /boot/efi/EFI/BOOT/
 }
 
-echo "=== Chapter 9 + fstab + release files"; c_ch9
+echo "=== Chapter 9 + fstab + release files"; c_ch9; c_emergency
 cat /etc/fstab
 set +e
 track 10.03 linux-7.1.8    linux-7.1.8.tar.xz  linux-7.1.8  p_linux

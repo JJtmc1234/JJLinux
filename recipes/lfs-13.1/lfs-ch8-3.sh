@@ -142,6 +142,9 @@ p_less() {
   ./configure --prefix=/usr --sysconfdir=/etc
   make
   chk make check
+  # JJLinux: less 704's "make check" rebuilds less with LESSTEST=1; rebuild the normal binary before installing
+  make clean
+  make
   make install
 }
 

@@ -62,3 +62,8 @@ Every departure from LFS 13.1-systemd as written. One line each: what changed, a
 ## v0.1 validation
 - grub.cfg reads grubenv and honors a one-shot `next_entry`, so `grub-reboot` can select rescue/emergency boots (used for automated validation).
 - Rebuild check compares stripped code for ELF files: the original Ch. 8 binaries carry debug info that is not bit-reproducible.
+
+## v0.1.1
+- 8.45 less: `make clean && make` after `make check` - less 704's `make check` rebuilds less with LESSTEST=1 (-DLESSTEST -DUSE_TERMCAP), so the book's following `make install` installs the test build. Found by the v0.1 recipe-rebuild check; reinstalled as JPM id less-704-r1.
+- JJLinux rule: emergency boot never asks for a password and is never disabled. emergency.service drop-in (10-jjlinux-nopasswd.conf) replaces sulogin with a root bash and remounts / rw. Anyone at the console gets root - intended.
+- grub.cfg: emergency entry boots `rw`; new last-resort entry `rw init=/bin/bash` (works even if systemd is broken). The one-shot `next_entry` block is now part of the Ch. 10 recipe.
