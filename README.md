@@ -8,16 +8,20 @@ AI agent layer (jjagentd) that observes and tunes the system.
 
 ## Status
 
-**v0.1.1** is done: LFS 13.1-systemd boots 10/10, rescue and emergency entries work, and a
-package rebuild reproduces (see `docs/V0.1-VALIDATION.md`). The build started in VirtualBox and
-now lives in a QEMU/KVM (libvirt) VM (see `docs/BUILD-ENV.md`).
-Next: package tracking + recipes (JPM), then BLFS toward Hyprland (v0.5).
+**v0.4 "Capsule"** runs in the `LFS-13.1` QEMU/KVM (libvirt) VM: LFS 13.1-systemd plus the BLFS
+stack up to Hyprland and the Omarchy desktop (see `docs/STATE.md`, `docs/BUILD-ENV.md`, and the stage
+scripts in `recipes/blfs-13.1/`). **v0.1.1** was validated first: 10/10 boots, rescue and emergency
+entries, and a package rebuild that reproduces (`docs/V0.1-VALIDATION.md`). The build started in VirtualBox.
+
+The agent layer (JLAF: `jjagentd`, policy engine, JPM, jash) is developed in a separate repo that
+currently exists only on the VM; see `docs/STATE.md`. Direction: kernel first (a `sched_ext` scheduler
+and in-kernel decision table), with the userspace agent as the support layer.
 
 ## Layout
 
 | Path | What lives there |
 |---|---|
-| `docs/` | Scope, decisions, build notes |
+| `docs/` | Scope, decisions, build notes, current state (`STATE.md`) |
 | `DEVIATIONS.md` | Every departure from the LFS/BLFS books, one line each, with the reason |
 | `logs/lfs-13.1/` | Build logs from the LFS build (feed future JPM recipes) |
 | `recipes/` | JPM build recipes (TOML), from Phase 3 |
