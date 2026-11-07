@@ -3,12 +3,17 @@
 ## Current: QEMU/KVM (libvirt)
 
 - Host machine: `mother` (Omarchy), libvirt `qemu:///system`
-- VM: libvirt domain `jj-linux`, 36 vCPU (1 socket, 18 cores, 2 threads, host-passthrough), 128 GiB RAM, VirtIO disks/net/video, SPICE display, NAT on the `default` network
-- Images live in `/var/lib/libvirt/images/jj-linux/` (btrfs nocow directory):
-  - `jj-linux.qcow2` - 100 GiB, `vda`, Debian 13.7.0 build host (GCC 14.2.0, Binutils 2.44)
-  - `lfs.qcow2` - 500 GiB, `vdb`, LFS target disk
-  - `lfs-boot.qcow2` - 500 GiB overlay with `lfs.qcow2` as its backing file. Not attached to the domain. Do not write to `lfs.qcow2` directly while the overlay exists.
-- Reach the guest: `ssh jj@$(virsh -c qemu:///system domifaddr jj-linux | awk '/ipv4/{print $4}' | cut -d/ -f1)`
+Two libvirt domains share the images in `/var/lib/libvirt/images/jj-linux/` (btrfs nocow directory):
+
+- **`LFS-13.1`** - boots JJLinux itself. BIOS (i440fx), 36 vCPU, 64 GiB RAM, one VirtIO disk `lfs-boot.qcow2` (500 GiB overlay with `lfs.qcow2` as its backing file), NAT on the `default` network. This is the domain to start. As of 2026-11-07 it boots JJLinux 0.4 (Capsule), hostname `jjlinux2`, kernel 7.1.8, Hyprland installed, boot in about 3.3 s.
+- **`jj-linux`** - the Debian 13.7.0 build host (GCC 14.2.0, Binutils 2.44). 36 vCPU (1 socket, 18 cores, 2 threads, host-passthrough), 128 GiB RAM, Q35. Disks: `jj-linux.qcow2` (100 GiB, `vda`) and `lfs.qcow2` (500 GiB, `vdb`, the LFS target).
+
+Images:
+- `jj-linux.qcow2` - Debian build host
+- `lfs.qcow2` - LFS target disk and the overlay's backing file. Do not start `jj-linux` or write to `lfs.qcow2` while `lfs-boot.qcow2` holds newer state, or the overlay is corrupted.
+- `lfs-boot.qcow2` - overlay used by `LFS-13.1`
+
+Reach the guest: `ssh jj@$(virsh -c qemu:///system domifaddr LFS-13.1 | awk '/ipv4/{print $4}' | cut -d/ -f1)`
 
 ## Original: VirtualBox (through v0.1.1, 2026-10-04 to 2026-10-05)
 
