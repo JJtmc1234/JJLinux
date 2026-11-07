@@ -8,8 +8,10 @@ AI agent layer (jjagentd) that observes and tunes the system.
 
 ## Status
 
-Phase 1: building LFS 13.1-systemd in a VirtualBox VM (Chapter 5, cross-toolchain).
-Next milestone: **v0.1** (base system boots in the VM).
+**v0.1.1** is done: LFS 13.1-systemd boots 10/10, rescue and emergency entries work, and a
+package rebuild reproduces (see `docs/V0.1-VALIDATION.md`). The build started in VirtualBox and
+now lives in a QEMU/KVM (libvirt) VM (see `docs/BUILD-ENV.md`).
+Next: package tracking + recipes (JPM), then BLFS toward Hyprland (v0.5).
 
 ## Layout
 

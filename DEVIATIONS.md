@@ -3,6 +3,7 @@
 Every departure from LFS 13.1-systemd as written. One line each: what changed, and why.
 
 ## Build environment (outside the book)
+- VM: moved from VirtualBox to QEMU/KVM under libvirt after v0.1.1 (the `jj-linux` domain, created 2026-10-10) - VirtualBox is broken on the current host. The VirtualBox-specific lines below (`--hpet on`, `ata-VBOX_HARDDISK` paths) describe the original build and no longer apply to the current VM. Details in `docs/BUILD-ENV.md`.
 - VM: VirtualBox `--hpet on` - fixes a VirtualBox timer bug on AMD Ryzen hosts that caused RCU stalls and multi-second sleep overruns (VirtualBox ticket #20131); measured before and after.
 - Build host: passwordless sudo for `jj` on the Debian VM - convenience on a throwaway build host.
 - Build host: DVD `cdrom:` apt source commented out - it broke `apt update`.
